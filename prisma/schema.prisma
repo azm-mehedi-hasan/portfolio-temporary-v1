@@ -1,0 +1,259 @@
+// Portfolio CMS schema.
+//
+// Every model here replaces content that used to be hardcoded in src/constants/*
+// or in MDX files under src/app/(site)/blog/. See SETUP.md for workflow.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum Status {
+  DRAFT
+  PUBLISHED
+}
+
+// ─────────────────────────────────────────────────────────── auth
+
+model Admin {
+  id           String    @id @default(cuid())
+  email        String    @unique
+  name         String
+  passwordHash String
+  lastLoginAt  DateTime?
+  createdAt    DateTime  @default(now())
+
+  auditLogs AuditLog[]
+}
+
+// ─────────────────────────────────────────── singletons & page copy
+
+/// Single row (id = "singleton"). Identity shown in the sidebar and footer.
+model SiteSettings {
+  id             String   @id @default("singleton")
+  ownerName      String
+  role           String
+  avatarUrl      String
+  footerText     String
+  resumeUrl      String?
+  resumeFileName String   @default("Resume.pdf")
+  ogImageUrl     String?
+  seoTitle       String
+  seoDescription String
+  updatedAt      DateTime @updatedAt
+}
+
+/// Editable copy + SEO for each public route.
+/// slug: home | about | projects | blog | contact | resume
+model Page {
+  id             String   @id @default(cuid())
+  slug           String   @unique
+  emoji          String?
+  heading        String
+  /// Lead paragraphs, rendered as MDX.
+  introMdx       String   @default("")
+  /// Secondary body (e.g. the long About narrative), rendered as MDX.
+  bodyMdx        String   @default("")
+  seoTitle       String
+  seoDescription String
+  updatedAt      DateTime @updatedAt
+}
+
+// ─────────────────────────────────────────────────────────── nav
+
+model NavLink {
+  id       String  @id @default(cuid())
+  label    String
+  href     String
+  /// Tabler icon name, resolved through the allowlist in src/lib/icons.ts
+  iconName String
+  order    Int     @default(0)
+  visible  Boolean @default(true)
+
+  @@index([order])
+}
+
+model Social {
+  id       String  @id @default(cuid())
+  label    String
+  href     String
+  iconName String
+  order    Int     @default(0)
+  visible  Boolean @default(true)
+
+  @@index([order])
+}
+
+// ─────────────────────────────────────────────────────── projects
+
+model Project {
+  id           String   @id @default(cuid())
+  slug         String   @unique
+  title        String
+  description  String
+  /// External "Live Preview" URL.
+  liveUrl      String
+  thumbnailUrl String
+  /// Long-form case study, MDX source.
+  contentMdx   String   @default("")
+  order        Int      @default(0)
+  status       Status   @default(PUBLISHED)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  images ProjectImage[]
+  stack  ProjectTech[]
+
+  @@index([status, order])
+}
+
+model ProjectImage {
+  id        String  @id @default(cuid())
+  projectId String
+  url       String
+  alt       String  @default("")
+  order     Int     @default(0)
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId, order])
+}
+
+/// Join table so a rename of a Tech propagates to every project chip.
+model ProjectTech {
+  projectId String
+  techId    String
+  order     Int     @default(0)
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  tech      Tech    @relation(fields: [techId], references: [id], onDelete: Cascade)
+
+  @@id([projectId, techId])
+  @@index([projectId, order])
+}
+
+// ─────────────────────────────────────────────────────────── blog
+
+model Post {
+  id             String    @id @default(cuid())
+  slug           String    @unique
+  title          String
+  description    String
+  coverImageUrl  String
+  /// Post body, MDX source.
+  contentMdx     String    @default("")
+  status         Status    @default(DRAFT)
+  publishedAt    DateTime?
+  readingMinutes Int       @default(1)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  tags PostTag[]
+
+  @@index([status, publishedAt])
+}
+
+model Tag {
+  id    String    @id @default(cuid())
+  name  String
+  slug  String    @unique
+  posts PostTag[]
+}
+
+model PostTag {
+  postId String
+  tagId  String
+  post   Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
+  tag    Tag    @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([postId, tagId])
+}
+
+// ─────────────────────────────────────────────────── page content
+
+model Tech {
+  id            String  @id @default(cuid())
+  name          String  @unique
+  logoUrl       String
+  /// Tailwind sizing carried over from the old hardcoded list.
+  displayWidth  String  @default("w-16")
+  displayHeight String  @default("h-16")
+  order         Int     @default(0)
+  /// Whether it appears in the "Tech Stack" grid (all tech can still tag projects).
+  showInStack   Boolean @default(true)
+
+  projects ProjectTech[]
+
+  @@index([order])
+}
+
+model TimelineEntry {
+  id               String   @id @default(cuid())
+  title            String
+  dateLabel        String   @default("")
+  description      String
+  responsibilities String[]
+  order            Int      @default(0)
+  visible          Boolean  @default(true)
+
+  @@index([order])
+}
+
+model GalleryImage {
+  id      String  @id @default(cuid())
+  url     String
+  alt     String  @default("")
+  order   Int     @default(0)
+  visible Boolean @default(true)
+
+  @@index([order])
+}
+
+// ────────────────────────────────────────────────────── operational
+
+model ContactMessage {
+  id         String   @id @default(cuid())
+  name       String
+  email      String
+  message    String
+  isRead     Boolean  @default(false)
+  isArchived Boolean  @default(false)
+  /// Hashed, not raw — throttling shouldn't mean storing personal data.
+  ipHash     String?
+  userAgent  String?
+  createdAt  DateTime @default(now())
+
+  @@index([isArchived, createdAt])
+}
+
+model MediaAsset {
+  id        String   @id @default(cuid())
+  publicId  String   @unique
+  url       String
+  width     Int
+  height    Int
+  format    String
+  bytes     Int
+  folder    String   @default("portfolio")
+  alt       String   @default("")
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  adminId   String?
+  action    String
+  entity    String
+  entityId  String?
+  summary   String   @default("")
+  createdAt DateTime @default(now())
+
+  admin Admin? @relation(fields: [adminId], references: [id], onDelete: SetNull)
+
+  @@index([createdAt])
+}

@@ -1,10 +1,8 @@
-"use client";
-
-export const Footer = () => {
+export const Footer = ({ text }: { text: string }) => {
   return (
     <div className="p-4 text-center justify-center text-xs text-neutral-500 border-t border-neutral-100">
       <span className="font-semibold">{new Date().getFullYear()} </span>
-      &#8212; Built by AZM Mehedi Hasan
+      &#8212; {text}
     </div>
   );
 };

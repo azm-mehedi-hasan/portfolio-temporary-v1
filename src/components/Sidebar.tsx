@@ -1,20 +1,44 @@
 "use client";
-import { navlinks } from "@/constants/navlinks";
-import { socials } from "@/constants/socials";
 import { isMobile } from "@/lib/utils";
-import { Navlink } from "@/types/navlink";
+import { getIcon } from "@/lib/icons";
 import { IconLayoutSidebarRightCollapse } from "@tabler/icons-react";
 import { AnimatePresence, motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { twMerge } from "tailwind-merge";
 import { Badge } from "./Badge";
 import { Heading } from "./Heading";
 
-export const Sidebar = () => {
-  const [open, setOpen] = useState(isMobile() ? false : true);
+export type SidebarLink = {
+  id: string;
+  label: string;
+  href: string;
+  iconName: string;
+};
+
+export const Sidebar = ({
+  navlinks,
+  socials,
+  ownerName,
+  role,
+  avatarUrl,
+}: {
+  navlinks: SidebarLink[];
+  socials: SidebarLink[];
+  ownerName: string;
+  role: string;
+  avatarUrl: string;
+}) => {
+  // Start open on both server and client so the markup matches, then collapse
+  // on mobile after mount. Deriving this during render caused a hydration
+  // mismatch: the server has no `window`, so it always rendered the open state.
+  const [open, setOpen] = useState(true);
+
+  useEffect(() => {
+    if (isMobile()) setOpen(false);
+  }, []);
 
   return (
     <>
@@ -28,8 +52,16 @@ export const Sidebar = () => {
             className="px-6  z-[100] py-10 bg-neutral-100 max-w-[14rem] lg:w-fit  fixed lg:relative  h-screen left-0 flex flex-col justify-between"
           >
             <div className="flex-1 overflow-auto">
-              <SidebarHeader />
-              <Navigation setOpen={setOpen} />
+              <SidebarHeader
+                ownerName={ownerName}
+                role={role}
+                avatarUrl={avatarUrl}
+              />
+              <Navigation
+                navlinks={navlinks}
+                socials={socials}
+                setOpen={setOpen}
+              />
             </div>
             <div onClick={() => isMobile() && setOpen(false)}>
               <Badge href="/resume" text="Read Resume" />
@@ -40,6 +72,7 @@ export const Sidebar = () => {
       <button
         className="fixed lg:hidden bottom-4 right-4 h-8 w-8 border border-neutral-200 rounded-full backdrop-blur-sm flex items-center justify-center z-50"
         onClick={() => setOpen(!open)}
+        aria-label="Toggle navigation"
       >
         <IconLayoutSidebarRightCollapse className="h-4 w-4 text-secondary" />
       </button>
@@ -48,8 +81,12 @@ export const Sidebar = () => {
 };
 
 export const Navigation = ({
+  navlinks,
+  socials,
   setOpen,
 }: {
+  navlinks: SidebarLink[];
+  socials: SidebarLink[];
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
   const pathname = usePathname();
@@ -58,63 +95,70 @@ export const Navigation = ({
 
   return (
     <div className="flex flex-col space-y-1 my-10 relative z-[100]">
-      {navlinks.map((link: Navlink) => (
-        <Link
-          key={link.href}
-          href={link.href}
-          onClick={() => isMobile() && setOpen(false)}
-          className={twMerge(
-            "text-secondary hover:text-primary transition duration-200 flex items-center space-x-2 py-2 px-2 rounded-md text-sm",
-            isActive(link.href) && "bg-white shadow-lg text-primary"
-          )}
-        >
-          <link.icon
+      {navlinks.map((link) => {
+        const Icon = getIcon(link.iconName);
+        return (
+          <Link
+            key={link.id}
+            href={link.href}
+            onClick={() => isMobile() && setOpen(false)}
             className={twMerge(
-              "h-4 w-4 flex-shrink-0",
-              isActive(link.href) && "text-sky-500"
+              "text-secondary hover:text-primary transition duration-200 flex items-center space-x-2 py-2 px-2 rounded-md text-sm",
+              isActive(link.href) && "bg-white shadow-lg text-primary"
             )}
-          />
-          <span>{link.label}</span>
-        </Link>
-      ))}
+          >
+            <Icon
+              className={twMerge(
+                "h-4 w-4 flex-shrink-0",
+                isActive(link.href) && "text-sky-500"
+              )}
+            />
+            <span>{link.label}</span>
+          </Link>
+        );
+      })}
 
       <Heading as="p" className="text-sm md:text-sm lg:text-sm pt-10 px-2">
         Socials
       </Heading>
-      {socials.map((link: Navlink) => (
-        <Link
-          key={link.href}
-          href={link.href}
-          className={twMerge(
-            "text-secondary hover:text-primary transition duration-200 flex items-center space-x-2 py-2 px-2 rounded-md text-sm"
-          )}
-        >
-          <link.icon
-            className={twMerge(
-              "h-4 w-4 flex-shrink-0",
-              isActive(link.href) && "text-sky-500"
-            )}
-          />
-          <span>{link.label}</span>
-        </Link>
-      ))}
+      {socials.map((link) => {
+        const Icon = getIcon(link.iconName);
+        return (
+          <Link
+            key={link.id}
+            href={link.href}
+            className="text-secondary hover:text-primary transition duration-200 flex items-center space-x-2 py-2 px-2 rounded-md text-sm"
+          >
+            <Icon className="h-4 w-4 flex-shrink-0" />
+            <span>{link.label}</span>
+          </Link>
+        );
+      })}
     </div>
   );
 };
 
-const SidebarHeader = () => {
+const SidebarHeader = ({
+  ownerName,
+  role,
+  avatarUrl,
+}: {
+  ownerName: string;
+  role: string;
+  avatarUrl: string;
+}) => {
   return (
     <div className="flex space-x-2">
       <Image
-        src="https://i.ibb.co/p4Crv6k/DP-WHIT.jpg"
-        alt="Mehedi Hasan"
+        src={avatarUrl}
+        alt={ownerName}
         height="40"
         width="40"
         className="object-cover object-top rounded-full flex-shrink-0"
       />
       <div className="flex text-sm flex-col">
-        <p className="font-bold text-primary">Mehedi Hasan</p>
-        <p className="font-light text-secondary">Developer</p>
+        <p className="font-bold text-primary">{ownerName}</p>
+        <p className="font-light text-secondary">{role}</p>
       </div>
     </div>
   );

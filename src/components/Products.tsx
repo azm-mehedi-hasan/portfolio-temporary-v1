@@ -1,38 +1,30 @@
-"use client";
-import React from "react";
-import { Heading } from "./Heading";
-import { Product } from "@/types/products";
-import { products } from "@/constants/products";
-import Link from "next/link";
 import Image from "next/image";
+import Link from "next/link";
+import { getProjects } from "@/lib/queries";
+import { Heading } from "./Heading";
 import { Paragraph } from "./Paragraph";
-import { motion } from "framer-motion";
+import { Reveal } from "./Reveal";
 
-export const Products = () => {
+/**
+ * Server Component. Previously this was "use client", which pulled the entire
+ * products module — including every project's long-form case study — into the
+ * browser bundle of both `/` and `/projects`.
+ */
+export const Products = async () => {
+  const products = await getProjects();
+
   return (
     <div>
-      <div className="grid grid-cols-1  gap-10">
-        {products.map((product: Product, idx: number) => (
-          <motion.div
-            key={product.href}
-            initial={{
-              opacity: 0,
-              x: -50,
-            }}
-            animate={{
-              opacity: 1,
-              x: 0,
-            }}
-            transition={{ duration: 0.2, delay: idx * 0.1 }}
-          >
+      <div className="grid grid-cols-1 gap-10">
+        {products.map((product, idx) => (
+          <Reveal key={product.id} index={idx}>
             <Link
-              href={product.slug ? `/projects/${product.slug}` : product.href}
-              key={product.href}
+              href={`/projects/${product.slug}`}
               className="group flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4 hover:bg-gray-50 rounded-2xl transition duration-200 pt-4"
             >
               <Image
-                src={product.thumbnail}
-                alt="thumbnail"
+                src={product.thumbnailUrl}
+                alt={product.title}
                 height="200"
                 width="200"
                 className="rounded-md"
@@ -49,19 +41,19 @@ export const Products = () => {
                     {product.description}
                   </Paragraph>
                 </div>
-                <div className="flex space-x-2 md:mb-1 mt-2 md:mt-0">
-                  {product.stack?.map((stack: string) => (
+                <div className="flex flex-wrap gap-2 md:mb-1 mt-2 md:mt-0">
+                  {product.stack.map(({ tech }) => (
                     <span
-                      key={stack}
-                      className="text-xs  md:text-xs lg:text-xs bg-gray-50 px-2 py-1 rounded-sm text-secondary"
+                      key={tech.id}
+                      className="text-xs md:text-xs lg:text-xs bg-gray-50 px-2 py-1 rounded-sm text-secondary"
                     >
-                      {stack}
+                      {tech.name}
                     </span>
                   ))}
                 </div>
               </div>
             </Link>
-          </motion.div>
+          </Reveal>
         ))}
       </div>
     </div>

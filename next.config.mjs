@@ -1,23 +1,15 @@
 /** @type {import('next').NextConfig} */
-import rehypePrism from "@mapbox/rehype-prism";
-import nextMDX from "@next/mdx";
-import remarkGfm from "remark-gfm";
-
 const nextConfig = {
   images: {
-    domains: ["images.unsplash.com", "res.cloudinary.com", "i.ibb.co"],
-  },
-  experimental: {
-    mdxRs: true,
+    remotePatterns: [
+      { protocol: "https", hostname: "images.unsplash.com" },
+      { protocol: "https", hostname: "res.cloudinary.com" },
+      { protocol: "https", hostname: "i.ibb.co" },
+    ],
   },
 };
 
-const withMDX = nextMDX({
-  extension: /\.mdx?$/,
-  options: {
-    remarkPlugins: [remarkGfm],
-    rehypePlugins: [rehypePrism],
-  },
-});
-
-export default withMDX(nextConfig);
+// MDX is no longer compiled from files — every article and case study lives in
+// Postgres and is rendered at request/build time by next-mdx-remote. See
+// src/components/Mdx.tsx for the remark/rehype pipeline and component allowlist.
+export default nextConfig;
