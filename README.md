@@ -27,8 +27,11 @@ npm run dev             # → http://localhost:3000
 
 Admin: **http://localhost:3000/admin/login**
 
-Full instructions — Prisma workflows, deployment, troubleshooting — are in
-**[SETUP.md](./SETUP.md)**.
+Step-by-step guides:
+
+- **[RUN-LOCAL.md](./RUN-LOCAL.md)** — running it on your machine, day to day
+- **[DEPLOY.md](./DEPLOY.md)** — getting it online (Neon, Cloudinary, Vercel)
+- **[SETUP.md](./SETUP.md)** — reference: Prisma internals, caching, backups
 
 ## Layout
 
