@@ -5,6 +5,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { saveSettings } from "@/lib/actions/content";
 import { MediaField } from "./MediaField";
+import { ResumeUploader } from "./ResumeUploader";
 import { Button, Card, Field, Input } from "./ui";
 
 export type SettingsValues = {
@@ -80,13 +81,21 @@ export function SettingsForm({ settings }: { settings: SettingsValues }) {
         <div className="grid gap-4 sm:grid-cols-2">
           <Field
             label="Resume file URL"
-            hint="Upload a PDF anywhere public, or keep the file in /public."
+            hint="Upload a PDF below, or paste a URL / /public path directly."
           >
-            <Input
-              value={values.resumeUrl}
-              onChange={(e) => set("resumeUrl", e.target.value)}
-              placeholder="/Mern_Stack_developer_Mehedi_Hasan.pdf"
-            />
+            <div className="flex gap-2">
+              <Input
+                value={values.resumeUrl}
+                onChange={(e) => set("resumeUrl", e.target.value)}
+                placeholder="/Mern_Stack_developer_Mehedi_Hasan.pdf"
+              />
+              <ResumeUploader
+                onUploaded={({ url, fileName }) => {
+                  set("resumeUrl", url);
+                  set("resumeFileName", fileName);
+                }}
+              />
+            </div>
           </Field>
           <Field label="Download filename">
             <Input

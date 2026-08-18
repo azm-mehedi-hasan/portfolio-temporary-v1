@@ -150,14 +150,37 @@ const SOCIALS = [
 
 const TIMELINE = [
   {
-    title: "Education",
-    dateLabel: "2018 - 2024",
-    description: "Bangladesh University of Engineering and Technology (BUET)",
+    title: "Jr. Software Engineer — TechnoNext Software Ltd",
+    dateLabel: "Nov 2025 - Present",
+    description:
+      "Backend engineer on a high-traffic ride-sharing platform and an AI-assisted cabin crew recruitment system, built with Java and Spring Boot.",
     responsibilities: [
-      "Completed a B.Sc. in Computer Science and Engineering.",
-      "Acquired foundational and advanced knowledge in software development and computer systems.",
-      "Developed practical and theoretical expertise through various academic projects.",
+      "Built the Loyalty & Rewards microservice end-to-end — reward earning, redemption, balance ledger, and race-condition-safe multi-tier progression.",
+      "Designed an extensible reward rule engine using OOP/SOLID principles with Strategy and Factory patterns, letting business rules change without redeployment.",
+      "Implemented concurrent-safe workflows using optimistic locking and atomic database operations to keep data consistent under concurrent requests.",
+      "Improved the Wallet & Withdrawal service with an atomic transaction ledger and integrated bKash/Nagad payment and disbursement APIs.",
+      "Enforced read/write database routing across PostgreSQL read replicas using Spring's AbstractRoutingDataSource to cut primary database read load and latency.",
+      "Integrated microservices with Spring Cloud OpenFeign, adding fallback, timeout, and failure-isolation mechanisms to prevent cascading service failures.",
+      "Built a Cabin Crew Recruitment web app for US-Bangla Airlines, including asynchronous video/audio/face-processing pipelines and AI-based face analysis for candidate evaluation.",
+      "Wrote unit/integration tests with JUnit and Mockito and maintained CI/CD pipelines for automated build and deployment.",
     ],
+  },
+  {
+    title: "Associate Software Engineer — Crystal Technology Ltd",
+    dateLabel: "Feb 2025 - Oct 2025",
+    description:
+      "Backend development for a Hospital Inventory Management System and a Medical Service Platform, using Spring Boot, PostgreSQL and Redis.",
+    responsibilities: [
+      "Built core backend functionality for a Hospital Inventory Management System covering requisition lifecycle, supplier management, and stock control.",
+      "Resolved real-time delivery/return tracking and automated ROL-based stock replenishment with Redis-driven low-stock expiry alerts.",
+      "Enhanced backend services for a Medical Service Platform supporting doctor-patient appointments, role-based access control, and secure session handling.",
+    ],
+  },
+  {
+    title: "Education",
+    dateLabel: "Apr 2018 - Nov 2024",
+    description: "Bangladesh University of Engineering and Technology (BUET)",
+    responsibilities: ["Bachelor of Science in Computer Science and Engineering."],
   },
   {
     title: "Projects",
@@ -171,21 +194,32 @@ const TIMELINE = [
     ],
   },
   {
-    title: "Skills",
+    title: "Technical Skills",
     dateLabel: "",
-    description: "A diverse set of technical and development skills.",
+    description:
+      "Core languages, frameworks and practices used across backend and full-stack work.",
     responsibilities: [
-      "Programming Languages: Java (Advanced), C++ (Intermediate), Python (Basic).",
-      "Web Development: HTML, CSS, JavaScript, React, Tailwind, Bootstrap.",
-      "Database Management: MySQL, Oracle.",
-      "Other Tools: Android Studio, Intellij, VS Code, REST APIs, Git.",
+      "Languages: Java, SQL, C++, JavaScript",
+      "Backend: Spring Boot, Spring MVC, Spring Security, Spring Data JPA, Hibernate, Spring Cloud OpenFeign",
+      "Architecture: Microservices, REST APIs, Event-Driven Systems, OOP, Clean Code, SOLID, Design Patterns, Enterprise Applications",
+      "Databases: PostgreSQL, MySQL, MongoDB, Oracle, Redis",
+      "Query & Data: Database Relationships, Joins, Transactions, Indexing, Query Optimization",
+      "Messaging: Apache Kafka, RabbitMQ, Reactive Streams",
+      "Transactions: Concurrency Control, Idempotent Processing, Atomic Transactions, Audit Logging, Failure Isolation",
+      "Development: Maven, Gradle, Git, Flyway, Swagger/OpenAPI, Docker, CI/CD",
+      "Testing: TDD, Unit Testing, JUnit, Mockito",
+      "Security: Spring Security, JWT, RBAC",
     ],
   },
   {
     title: "Certifications",
     dateLabel: "",
     description: "Recognized skills and achievements.",
-    responsibilities: ["Problem Solving (Intermediate) – Hackerrank Certification."],
+    responsibilities: [
+      "Problem Solving (Intermediate) – HackerRank Certification.",
+      "Problem Solving (Basic) – HackerRank Certification.",
+      "Java (Basic) – HackerRank Certification.",
+    ],
   },
 ];
 
