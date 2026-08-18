@@ -38,7 +38,7 @@ export default async function SiteLayout({
   return (
     <html lang="en">
       <head>
-        <link rel="shortcut icon" href="/fav.webp" type="image/x-icon" />
+        <link rel="icon" href="/images/portfolio_fav.png" type="image/png" />
       </head>
       <body
         className={twMerge(

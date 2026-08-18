@@ -20,7 +20,7 @@ export default function AdminRootLayout({
   return (
     <html lang="en">
       <head>
-        <link rel="shortcut icon" href="/fav.webp" type="image/x-icon" />
+        <link rel="icon" href="/images/portfolio_fav.png" type="image/png" />
       </head>
       <body className={`${inter.className} bg-neutral-50 text-neutral-800 antialiased`}>
         {children}
